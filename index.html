@@ -101,8 +101,10 @@
     .pay-opt-icon{font-size:20px;flex-shrink:0;}
     .pay-opt-info .pay-label{font-size:13px;font-weight:bold;}
     .pay-opt-info .pay-desc{font-size:11px;color:var(--text-sub);}
-    .qr-section{background:rgba(var(--primary-rgb),.06);border:1.5px solid rgba(var(--primary-rgb),.25);border-radius:var(--radius-md);padding:14px;text-align:center;margin:10px 0;}
-    .qr-img{max-width:200px;border-radius:10px;margin:8px auto;display:block;border:3px solid var(--primary);}
+    .qr-section{background:linear-gradient(135deg,rgba(var(--primary-rgb),.08),rgba(var(--primary-rgb),.03));border:2px solid rgba(var(--primary-rgb),.3);border-radius:14px;padding:18px 14px;text-align:center;margin:12px 0;}
+    .qr-section-title{font-size:14px;font-weight:bold;color:var(--primary);margin-bottom:4px;}
+    .qr-section-sub{font-size:11px;color:var(--text-sub);margin-bottom:10px;}
+    .qr-img{max-width:260px;width:85%;border-radius:12px;margin:0 auto 10px;display:block;border:4px solid var(--primary);box-shadow:0 4px 16px rgba(var(--primary-rgb),.25);}
     .slip-upload-area{border:2px dashed var(--primary);border-radius:var(--radius-md);padding:16px;text-align:center;cursor:pointer;margin-top:8px;}
     .slip-preview{max-width:100%;max-height:200px;border-radius:8px;margin-top:8px;display:none;}
     .order-summary{background:rgba(var(--primary-rgb),.05);border:1px solid rgba(var(--primary-rgb),.2);border-radius:var(--radius-md);padding:12px;margin-bottom:12px;}
@@ -262,15 +264,19 @@
       </div>
       <!-- QR + Slip section (ສໍາລັບ ໂອນຈ່າຍ) -->
       <div class="qr-section" id="qr-section" style="display:none">
-        <div style="font-size:13px;font-weight:bold;margin-bottom:6px">📸 ສະແກນ QR ຊຳລະ</div>
-        <img id="qr-img" src="" class="qr-img" onerror="this.style.display='none'" alt="QR">
-        <div style="font-size:12px;color:var(--text-sub);margin-top:6px">ຫຼັງໂອນ → ຖ່າຍ Slip ແລ້ວ Upload</div>
-        <div class="slip-upload-area" onclick="document.getElementById('slip-file').click()">
-          <div style="font-size:22px">📷</div>
-          <div style="font-size:12px;margin-top:4px">ກົດເພື່ອ Upload Slip</div>
-          <img id="slip-preview-img" class="slip-preview" src="" alt="">
+        <div class="qr-section-title">📱 ສະແກນ QR ຊຳລະເງີນ</div>
+        <div class="qr-section-sub">ສະແກນ → ໂອນ → ຖ່າຍ Slip → Upload ລຸ່ມນີ້</div>
+        <img id="qr-img" src="" class="qr-img" onerror="this.style.display='none'" alt="QR Payment">
+        <div style="background:rgba(var(--primary-rgb),.08);border-radius:10px;padding:12px;margin-top:8px">
+          <div style="font-size:12px;font-weight:bold;margin-bottom:8px;color:var(--primary)">📸 Upload Slip ໂອນ *</div>
+          <div class="slip-upload-area" onclick="document.getElementById('slip-file').click()" style="border-radius:10px;padding:20px">
+            <div style="font-size:28px">📷</div>
+            <div style="font-size:13px;margin-top:6px;font-weight:bold">ກົດເພື່ອ Upload Slip</div>
+            <div style="font-size:11px;color:var(--text-sub);margin-top:3px">JPG, PNG — ຮູບຫຼັກຖານການໂອນ</div>
+            <img id="slip-preview-img" class="slip-preview" src="" alt="" style="max-height:180px;border-radius:8px;margin-top:10px">
+          </div>
+          <input type="file" id="slip-file" accept="image/*" style="display:none" onchange="previewSlip(this)">
         </div>
-        <input type="file" id="slip-file" accept="image/*" style="display:none" onchange="previewSlip(this)">
       </div>
       <div class="form-group">
         <label class="form-label">📝 ໝາຍເຫດ</label>
@@ -523,8 +529,15 @@ function updatePayMethod(){
   const pay=document.querySelector("input[name='ck-pay']:checked");
   const opt=SHOP_CONFIG.paymentOptions.find(o=>pay&&o.value===pay.value);
   const qs=document.getElementById("qr-section");
-  qs.style.display=(opt&&opt.requireSlip)?"block":"none";
-  if(opt&&opt.requireSlip){document.getElementById("qr-img").src=SHOP_CONFIG.qrPaymentUrl||"";}
+  const show=(opt&&opt.requireSlip);
+  qs.style.display=show?"block":"none";
+  if(show){
+    const qrEl=document.getElementById("qr-img");
+    qrEl.src=SHOP_CONFIG.qrPaymentUrl||"";
+    qrEl.style.display="block";
+    // Scroll to QR
+    setTimeout(()=>qs.scrollIntoView({behavior:"smooth",block:"nearest"}),200);
+  }
 }
 function updateCheckoutShip(){}
 
@@ -634,10 +647,10 @@ function renderStatus(res){
 
 function renderStatusCard(o){
   const statusDef=[
-    {key:"ລໍຖ້າຮັບຍອດ",       emoji:"⏳", label:"ລໍຖ້າຮັບຍອດ",      cls:"status-waiting"},
-    {key:"ແມ່ຄ້າຮັບຍອດແລ້ວ",  emoji:"✅", label:"ຮັບຍອດແລ້ວ",        cls:"status-accepted"},
-    {key:"ກຳລັງກຽມການຈັດສົ່ງ", emoji:"📦", label:"ກຳລັງກຽມສົ່ງ",     cls:"status-packing"},
-    {key:"ຈັດສົ່ງສຳເລັດ",      emoji:"🎉", label:"ສົ່ງສຳເລັດ",        cls:"status-shipped"},
+    {key:"ລໍຖ້າຮັບຍອດ",        emoji:"⏳", label:"ລໍຖ້າຮັບຍອດ",      cls:"status-waiting"},
+    {key:"ແມ່ຄ້າຮັບຍອດແລ້ວ",   emoji:"✅", label:"ຮັບຍອດແລ້ວ",        cls:"status-accepted"},
+    {key:"ກຳລັງກຽມການຈັດສົ່ງ",  emoji:"📦", label:"ກຳລັງກຽມສົ່ງ",     cls:"status-packing"},
+    {key:"ຈັດສົ່ງສຳເລັດ",       emoji:"🎉", label:"ສົ່ງສຳເລັດ",        cls:"status-shipped"},
   ];
   const curIdx=Math.max(0,statusDef.findIndex(s=>s.key===o.orderStatus));
   const cur=statusDef[curIdx];
@@ -645,37 +658,54 @@ function renderStatusCard(o){
 
   // Road animation
   const roadHtml=`
-  <div style="margin:14px 0 16px;padding:0 4px">
+  <div style="margin:14px 0 18px;padding:0 4px">
     <div style="position:relative;height:64px">
       <div style="position:absolute;top:30px;left:0;right:0;height:6px;background:#eee;border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
       </div>
-      <div style="position:absolute;top:12px;left:calc(${pct}% - ${pct>2?'20px':'0px'});transition:left 1.2s cubic-bezier(.4,0,.2,1);font-size:24px">🛵</div>
+      <div style="position:absolute;top:10px;left:calc(${pct}% - ${pct>2?'20px':'0px'});transition:left 1.2s cubic-bezier(.4,0,.2,1);font-size:26px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))">🛵</div>
       <div style="position:absolute;top:24px;left:0;right:0;display:flex;justify-content:space-between;padding:0 2px">
-        ${statusDef.map((s,i)=>{
+        ${statusDef.map((sd,i)=>{
           const done=i<=curIdx;
           return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-            <div style="width:22px;height:22px;border-radius:50%;background:${done?'var(--primary)':'#e0e0e0'};display:flex;align-items:center;justify-content:center;font-size:11px;color:${done?'#fff':'#aaa'};transition:background .6s">${done?'✓':i+1}</div>
-            <span style="font-size:9px;color:${done?'var(--primary)':'#bbb'};font-weight:${done?'bold':'normal'};white-space:nowrap">${s.label.replace('ລໍຖ້າຮັບຍອດ','ລໍຖ້າ').replace('ຮັບຍອດແລ້ວ','ຮັບຍອດ').replace('ກຳລັງກຽມສົ່ງ','ກຽມສົ່ງ').replace('ສົ່ງສຳເລັດ','ສ່ງແລ້ວ')}</span>
+            <div style="width:22px;height:22px;border-radius:50%;background:${done?'var(--primary)':'#e0e0e0'};display:flex;align-items:center;justify-content:center;font-size:11px;color:${done?'#fff':'#aaa'};font-weight:bold">${done?'✓':i+1}</div>
+            <span style="font-size:9px;color:${done?'var(--primary)':'#bbb'};font-weight:${done?'bold':'normal'};white-space:nowrap">${['ລໍຖ້າ','ຮັບຍອດ','ກຽມສົ່ງ','ສ່ງແລ້ວ'][i]}</span>
           </div>`;
         }).join('')}
       </div>
     </div>
   </div>`;
 
-  // Items detail
+  // Items ordered
   const itemsHtml = o.itemsSummary
-    ? `<div style="background:rgba(var(--primary-rgb),.05);border-left:3px solid var(--primary);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:var(--text-sub);margin-bottom:10px;line-height:1.8">${String(o.itemsSummary).replace(/\n/g,'<br>')}</div>`
+    ? `<div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--text-sub);margin-bottom:5px;font-weight:bold">🛍️ ລາຍການສິນຄ້າ</div>
+        <div style="background:rgba(var(--primary-rgb),.05);border-left:3px solid var(--primary);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:var(--text);line-height:1.8">${String(o.itemsSummary).replace(/\n/g,'<br>')}</div>
+      </div>`
     : "";
 
-  // Slip
+  // Slip image
   const slipHtml = o.slipUrl
-    ? `<a href="${o.slipUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);border-radius:8px;padding:7px 12px;font-size:12px;color:#27ae60;text-decoration:none;font-weight:bold">📸 ເບິ່ງ Slip ໂອນ ▶</a>`
-    : `<span style="font-size:12px;color:#aaa">📸 ຍັງບໍ່ມີ Slip</span>`;
+    ? `<div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--text-sub);margin-bottom:6px;font-weight:bold">📸 Slip ການໂອນ</div>
+        <a href="${o.slipUrl}" target="_blank">
+          <img src="${driveThumb(o.slipUrl,400)}" style="width:100%;max-width:320px;border-radius:10px;border:2px solid rgba(var(--primary-rgb),.3);display:block" onerror="this.style.display='none'" alt="Slip">
+        </a>
+        <div style="font-size:10px;color:var(--text-sub);margin-top:4px">ກົດຮູບເພື່ອເປີດຂະໜາດໃຫ່ຍ</div>
+      </div>`
+    : (o.slipStatus
+        ? `<div style="font-size:12px;color:var(--text-sub);margin-bottom:10px">📸 Slip: ${o.slipStatus}</div>`
+        : "");
 
-  // Ship bill
+  // Shipping bill
   const billHtml = o.shippingBillUrl
-    ? `<a href="${o.shippingBillUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(52,152,219,.1);border:1px solid rgba(52,152,219,.3);border-radius:8px;padding:7px 12px;font-size:12px;color:#2980b9;text-decoration:none;font-weight:bold">📤 ເບິ່ງບິນຂົນສົ່ງ ▶</a>`
+    ? `<div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--text-sub);margin-bottom:6px;font-weight:bold">📦 ບິນຂົນສົ່ງ</div>
+        <a href="${o.shippingBillUrl}" target="_blank">
+          <img src="${driveThumb(o.shippingBillUrl,400)}" style="width:100%;max-width:320px;border-radius:10px;border:2px solid rgba(52,152,219,.3);display:block" onerror="this.parentElement.innerHTML='<a href=\'${o.shippingBillUrl}\' target=\'_blank\' style=\'display:inline-flex;align-items:center;gap:6px;background:rgba(52,152,219,.1);border:1px solid rgba(52,152,219,.3);border-radius:8px;padding:8px 12px;font-size:12px;color:#2980b9;text-decoration:none;font-weight:bold\'>📤 ເບິ່ງບິນຂົນສົ່ງ ▶</a>'" alt="ບິນຂົນສົ່ງ">
+        </a>
+        <div style="font-size:10px;color:var(--text-sub);margin-top:4px">ກົດຮູບເພື່ອເປີດຂະໜາດໃຫ່ຍ</div>
+      </div>`
     : "";
 
   return `<div class="status-card" style="margin-bottom:12px">
@@ -688,7 +718,7 @@ function renderStatusCard(o){
     </div>
     ${roadHtml}
 
-    <div style="background:rgba(0,0,0,.02);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+    <div style="background:rgba(0,0,0,.02);border-radius:10px;padding:10px 12px;margin-bottom:12px">
       <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:12px">
         <span style="color:var(--text-sub)">👤</span><span style="font-weight:bold">${o.customerName||"-"}</span>
         <span style="color:var(--text-sub)">📞</span><span>${o.customerPhone||"-"}</span>
@@ -700,11 +730,8 @@ function renderStatusCard(o){
     </div>
 
     ${itemsHtml}
-
-    <div style="display:flex;flex-wrap:wrap;gap:8px">
-      ${slipHtml}
-      ${billHtml}
-    </div>
+    ${slipHtml}
+    ${billHtml}
   </div>`;
 }
 
