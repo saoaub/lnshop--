@@ -635,63 +635,81 @@ function renderStatus(res){
 }
 
 function renderStatusCard(o){
-  const statusMap={
-    "ລໍຖ້າຮັບຍອດ":       {emoji:"⏳",cls:"status-waiting",  label:"ລໍຖ້າຮັບຍອດ"},
-    "ແມ່ຄ້າຮັບຍອດແລ້ວ":  {emoji:"✅",cls:"status-accepted", label:"ຮັບຍອດແລ້ວ"},
-    "ກຳລັງກຽມການຈັດສົ່ງ":{emoji:"📦",cls:"status-packing",  label:"ກຽມສົ່ງ"},
-    "ຈັດສົ່ງສຳເລັດ":     {emoji:"🎉",cls:"status-shipped",  label:"ສົ່ງສຳເລັດ"},
-  };
-  const st=statusMap[o.orderStatus]||{emoji:"❓",cls:"status-waiting",label:o.orderStatus||"?"};
-  const steps=[
-    {key:"ລໍຖ້າຮັບຍອດ",    label:"ລໍຖ້າ",   icon:"🏪"},
-    {key:"ແມ່ຄ້າຮັບຍອດແລ້ວ",label:"ຮັບຍອດ", icon:"✅"},
-    {key:"ກຳລັງກຽມການຈັດສົ່ງ",label:"ກຽມສົ່ງ",icon:"📦"},
-    {key:"ຈັດສົ່ງສຳເລັດ", label:"ສ່ງແລ້ວ",  icon:"🎉"},
+  const statusDef=[
+    {key:"ລໍຖ້າຮັບຍອດ",       emoji:"⏳", label:"ລໍຖ້າຮັບຍອດ",      cls:"status-waiting"},
+    {key:"ແມ່ຄ້າຮັບຍອດແລ້ວ",  emoji:"✅", label:"ຮັບຍອດແລ້ວ",        cls:"status-accepted"},
+    {key:"ກຳລັງກຽມການຈັດສົ່ງ", emoji:"📦", label:"ກຳລັງກຽມສົ່ງ",     cls:"status-packing"},
+    {key:"ຈັດສົ່ງສຳເລັດ",      emoji:"🎉", label:"ສົ່ງສຳເລັດ",        cls:"status-shipped"},
   ];
-  const curIdx=Math.max(0,steps.findIndex(s=>s.key===o.orderStatus));
-  const pct=curIdx===0?0:curIdx===1?33:curIdx===2?66:100;
+  const curIdx=Math.max(0,statusDef.findIndex(s=>s.key===o.orderStatus));
+  const cur=statusDef[curIdx];
+  const pct=[0,33,66,100][curIdx];
 
-  // Road tracker HTML
+  // Road animation
   const roadHtml=`
-  <div style="margin:14px 0 10px;padding:0 8px">
-    <div style="position:relative;height:60px;">
-      <!-- Road -->
-      <div style="position:absolute;top:28px;left:0;right:0;height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+  <div style="margin:14px 0 16px;padding:0 4px">
+    <div style="position:relative;height:64px">
+      <div style="position:absolute;top:30px;left:0;right:0;height:6px;background:#eee;border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
       </div>
-      <!-- Car -->
-      <div style="position:absolute;top:10px;left:calc(${pct}% - ${pct>2?16:0}px);transition:left 1.2s cubic-bezier(.4,0,.2,1);font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))">🛵</div>
-      <!-- Stops -->
-      <div style="position:absolute;top:22px;left:0;right:0;display:flex;justify-content:space-between">
-        ${steps.map((s,i)=>{
+      <div style="position:absolute;top:12px;left:calc(${pct}% - ${pct>2?'20px':'0px'});transition:left 1.2s cubic-bezier(.4,0,.2,1);font-size:24px">🛵</div>
+      <div style="position:absolute;top:24px;left:0;right:0;display:flex;justify-content:space-between;padding:0 2px">
+        ${statusDef.map((s,i)=>{
           const done=i<=curIdx;
-          return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-            <div style="width:20px;height:20px;border-radius:50%;background:${done?'var(--primary)':'#ddd'};display:flex;align-items:center;justify-content:center;font-size:10px;transition:background .5s">${done?'✓':''}</div>
-            <span style="font-size:9px;color:${done?'var(--primary)':'#aaa'};font-weight:${done?'bold':'normal'};margin-top:2px;white-space:nowrap">${s.label}</span>
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+            <div style="width:22px;height:22px;border-radius:50%;background:${done?'var(--primary)':'#e0e0e0'};display:flex;align-items:center;justify-content:center;font-size:11px;color:${done?'#fff':'#aaa'};transition:background .6s">${done?'✓':i+1}</div>
+            <span style="font-size:9px;color:${done?'var(--primary)':'#bbb'};font-weight:${done?'bold':'normal'};white-space:nowrap">${s.label.replace('ລໍຖ້າຮັບຍອດ','ລໍຖ້າ').replace('ຮັບຍອດແລ້ວ','ຮັບຍອດ').replace('ກຳລັງກຽມສົ່ງ','ກຽມສົ່ງ').replace('ສົ່ງສຳເລັດ','ສ່ງແລ້ວ')}</span>
           </div>`;
         }).join('')}
       </div>
     </div>
   </div>`;
 
-  const sbUrl=o.shippingBillUrl?`<div style="margin-top:10px"><a href="${o.shippingBillUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(52,152,219,.1);border:1px solid rgba(52,152,219,.3);border-radius:8px;padding:8px 12px;font-size:12px;color:#3498db;text-decoration:none;font-weight:bold">📤 ເບິ່ງບິນຂົນສົ່ງ ▶</a></div>`:"";
+  // Items detail
+  const itemsHtml = o.itemsSummary
+    ? `<div style="background:rgba(var(--primary-rgb),.05);border-left:3px solid var(--primary);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:var(--text-sub);margin-bottom:10px;line-height:1.8">${String(o.itemsSummary).replace(/\n/g,'<br>')}</div>`
+    : "";
+
+  // Slip
+  const slipHtml = o.slipUrl
+    ? `<a href="${o.slipUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);border-radius:8px;padding:7px 12px;font-size:12px;color:#27ae60;text-decoration:none;font-weight:bold">📸 ເບິ່ງ Slip ໂອນ ▶</a>`
+    : `<span style="font-size:12px;color:#aaa">📸 ຍັງບໍ່ມີ Slip</span>`;
+
+  // Ship bill
+  const billHtml = o.shippingBillUrl
+    ? `<a href="${o.shippingBillUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:rgba(52,152,219,.1);border:1px solid rgba(52,152,219,.3);border-radius:8px;padding:7px 12px;font-size:12px;color:#2980b9;text-decoration:none;font-weight:bold">📤 ເບິ່ງບິນຂົນສົ່ງ ▶</a>`
+    : "";
 
   return `<div class="status-card" style="margin-bottom:12px">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-      <div><div style="font-size:11px;color:var(--text-sub)">ລະຫັດ Order</div><div style="font-size:18px;font-weight:800;color:var(--primary);letter-spacing:1px">${o.code||"-"}</div></div>
-      <span class="status-badge ${st.cls}">${st.emoji} ${st.label}</span>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+      <div>
+        <div style="font-size:11px;color:var(--text-sub)">ລະຫັດ Order</div>
+        <div style="font-size:20px;font-weight:800;color:var(--primary);letter-spacing:1px">${o.code||"-"}</div>
+      </div>
+      <span class="status-badge ${cur.cls}">${cur.emoji} ${cur.label}</span>
     </div>
     ${roadHtml}
-    <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:12px;margin:10px 0 8px;background:rgba(var(--primary-rgb),.04);border-radius:8px;padding:10px">
-      <span style="color:var(--text-sub)">👤</span><span style="font-weight:bold">${o.customerName||"-"}</span>
-      <span style="color:var(--text-sub)">📞</span><span>${o.customerPhone||"-"}</span>
-      <span style="color:var(--text-sub)">📍</span><span>${o.customerAddr||"-"}</span>
-      <span style="color:var(--text-sub)">🚚</span><span>${o.shipping||"-"}</span>
-      <span style="color:var(--text-sub)">💰</span><span style="font-weight:bold;color:var(--primary)">${fN(o.totalAmount||0)} ₭</span>
+
+    <div style="background:rgba(0,0,0,.02);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:12px">
+        <span style="color:var(--text-sub)">👤</span><span style="font-weight:bold">${o.customerName||"-"}</span>
+        <span style="color:var(--text-sub)">📞</span><span>${o.customerPhone||"-"}</span>
+        <span style="color:var(--text-sub)">📍</span><span>${o.customerAddr||"-"}</span>
+        <span style="color:var(--text-sub)">🚚</span><span>${o.shipping||"-"}</span>
+        <span style="color:var(--text-sub)">💳</span><span>${o.payment||"-"}</span>
+        <span style="color:var(--text-sub)">💰</span><span style="font-weight:bold;color:var(--primary)">${fN(o.totalAmount||0)} ₭</span>
+      </div>
     </div>
-    ${sbUrl}
+
+    ${itemsHtml}
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      ${slipHtml}
+      ${billHtml}
+    </div>
   </div>`;
 }
+
 
 // api calls use direct fetch in shop page
 </script>
