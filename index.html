@@ -383,11 +383,28 @@ async function loadProds(){
   try{
     const url=SHOP_CONFIG.orderApiUrl+"?action=getProducts";
     const res=await fetch(url,{method:"GET",redirect:"follow"});
-    const json=await res.json();
-    const rows=Array.isArray(json)?json:(Array.isArray(json.data)?json.data:[]);
+    const text=await res.text();
+    let json;
+    try{ json=JSON.parse(text); }
+    catch(parseErr){
+      console.error("Raw response:",text.substring(0,300));
+      throw new Error("API ຕອບກັບ format ຜິດ — ກວດ orderApiUrl");
+    }
+    let rows=[];
+    if(Array.isArray(json)) rows=json;
+    else if(json&&Array.isArray(json.data)) rows=json.data;
+    else if(json&&json.success===false) throw new Error(json.error||"API error");
+    if(!rows.length){
+      document.getElementById("prod-grid").innerHTML='<div style="grid-column:1/-1" class="empty-state">🔍 ຍັງບໍ່ມີສິນຄ້າໃນລະບົບ</div>';
+      document.getElementById("prod-count").textContent="";
+      return;
+    }
     allProds=rows.map(r=>({name:r[0],cost:r[1],price:r[2],qty:r[3],img:r[4]}));
     renderProds(allProds);
-  }catch(e){document.getElementById("prod-grid").innerHTML=`<div style="grid-column:1/-1" class="empty-state">❌ ໂຫຼດບໍ່ສຳເລັດ: ${e.message}</div>`;}
+  }catch(e){
+    console.error("loadProds error:",e);
+    document.getElementById("prod-grid").innerHTML=`<div style="grid-column:1/-1" class="empty-state">❌ ໂຫຼດບໍ່ສຳເລັດ: ${e.message}</div>`;
+  }
   finally{hideLoading();}
 }
 function filterProds(){const q=document.getElementById("prod-search").value.toLowerCase().trim();renderProds(q?allProds.filter(p=>(p.name||"").toLowerCase().includes(q)):allProds);}
@@ -534,14 +551,21 @@ async function submitOrder(){
 
   showLoading();
   try{
-    const res=await api.post("submitCustomerOrder",{
-      data:{
+    const postUrl=SHOP_CONFIG.orderApiUrl;
+    const postRes=await fetch(postUrl,{
+      method:"POST",redirect:"follow",
+      headers:{"Content-Type":"text/plain"},
+      body:JSON.stringify({action:"submitCustomerOrder",data:{
         code,customerName:name,customerPhone:phone,
         customerAddr:addr,shipping,payment:pay.value,
         totalAmount:total,note,slipBase64:slipBase64||"",
         cart:items.map(i=>({name:i.name,qty:i.qty,price:Number(i.price)||0}))
-      }
-    },true);
+      }})
+    });
+    const postText=await postRes.text();
+    let res;
+    try{ res=JSON.parse(postText); }catch(e){ throw new Error("ສ່ງບໍ່ສຳເລັດ — API format ຜິດ"); }
+    if(res.status==="error") throw new Error(res.message||"ຜິດພາດ");
 
     closeCheckout();
     document.getElementById("tab-shop").style.display="none";
