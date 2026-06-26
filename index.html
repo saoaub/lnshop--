@@ -19,7 +19,7 @@
     .header-social{display:flex;gap:5px;flex-wrap:wrap;padding:0 14px 8px;}
     .social-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 10px;font-size:11px;color:#fff;cursor:pointer;text-decoration:none;border:1px solid rgba(255,255,255,.3);}
     /* MARQUEE */
-    .marquee-wrap{background:linear-gradient(90deg,#1a4a35,#339972 40%,#1a4a35);overflow:hidden;height:32px;display:flex;align-items:center;}
+    .marquee-wrap{background:linear-gradient(90deg,#880044,#e91e63 40%,#880044);overflow:hidden;height:32px;display:flex;align-items:center;}
     .marquee-lbl{flex-shrink:0;background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:700;padding:0 10px;height:100%;display:flex;align-items:center;}
     .marquee-body{flex:1;overflow:hidden;position:relative;height:100%;}
     .marquee-inner{display:flex;align-items:center;height:100%;position:absolute;white-space:nowrap;animation:mScroll 28s linear infinite;}
@@ -312,10 +312,22 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 
 function buildSocial(){
-  const icons={facebook:"📘",tiktok:"🎵",whatsapp:"💬",instagram:"📸"};
+  const svgs={
+    facebook:`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>`,
+    tiktok:`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>`,
+    whatsapp:`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`,
+    whatsapp2:`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`,
+    instagram:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>`,
+  };
+  const bgColors={facebook:"#1877f2",tiktok:"#000",whatsapp:"#25d366",whatsapp2:"#25d366",instagram:"#e1306c"};
+  const names={facebook:"Facebook",tiktok:"TikTok",whatsapp:"WhatsApp",whatsapp2:"WhatsApp 2",instagram:"Instagram"};
   let h="";
   const s=SHOP_CONFIG.social||{};
-  Object.keys(s).forEach(k=>{const item=s[k];if(item&&item.url)h+=`<a href="${item.url}" target="_blank" class="social-btn"><span>${icons[k]||"🔗"}</span>${item.name||""}</a>`;});
+  Object.keys(s).forEach(k=>{
+    const item=s[k];if(!item||!item.url)return;
+    const bg=bgColors[k]||"#555";
+    h+=`<a href="${item.url}" target="_blank" class="social-btn" style="background:${bg};border-color:${bg};color:#fff"><span style="display:flex;align-items:center">${svgs[k]||"🔗"}</span><span style="margin-left:4px">${item.name||names[k]||k}</span></a>`;
+  });
   document.getElementById("header-social").innerHTML=h;
 
   // contact tab
@@ -323,8 +335,12 @@ function buildSocial(){
   let ch="";
   Object.keys(s).forEach(k=>{
     const item=s[k];if(!item||!item.url)return;
-    const label={facebook:"Facebook",tiktok:"TikTok",whatsapp:"WhatsApp",instagram:"Instagram"}[k]||k;
-    ch+=`<a href="${item.url}" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);"><span style="font-size:24px">${icons[k]||"🔗"}</span><div><div style="font-weight:bold;font-size:14px">${label}</div><div style="font-size:12px;color:var(--text-sub)">${item.name||""}</div></div><span style="margin-left:auto;color:var(--primary)">▶</span></a>`;
+    const bg=bgColors[k]||"#555";
+    const nm=names[k]||k;
+    ch+=`<a href="${item.url}" target="_blank" style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);">
+      <div style="width:44px;height:44px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0">${svgs[k]||"🔗"}</div>
+      <div><div style="font-weight:bold;font-size:14px">${nm}</div><div style="font-size:12px;color:var(--text-sub)">${item.name||""}</div></div>
+      <span style="margin-left:auto;color:var(--primary)">▶</span></a>`;
   });
   cl.innerHTML=ch||'<div class="empty-state">ບໍ່ມີ</div>';
 }
@@ -620,35 +636,60 @@ function renderStatus(res){
 
 function renderStatusCard(o){
   const statusMap={
-    "ລໍຖ້າຮັບຍອດ":   {emoji:"⏳",cls:"status-waiting",label:"ລໍຖ້າຮັບຍອດ"},
-    "ແມ່ຄ້າຮັບຍອດແລ້ວ": {emoji:"✅",cls:"status-accepted",label:"ຮັບຍອດແລ້ວ"},
-    "ກຳລັງກຽມການຈັດສົ່ງ":{emoji:"📦",cls:"status-packing",label:"ກຽມສົ່ງ"},
-    "ຈັດສົ່ງສຳເລັດ":  {emoji:"🎉",cls:"status-shipped",label:"ສົ່ງສຳເລັດ"},
+    "ລໍຖ້າຮັບຍອດ":       {emoji:"⏳",cls:"status-waiting",  label:"ລໍຖ້າຮັບຍອດ"},
+    "ແມ່ຄ້າຮັບຍອດແລ້ວ":  {emoji:"✅",cls:"status-accepted", label:"ຮັບຍອດແລ້ວ"},
+    "ກຳລັງກຽມການຈັດສົ່ງ":{emoji:"📦",cls:"status-packing",  label:"ກຽມສົ່ງ"},
+    "ຈັດສົ່ງສຳເລັດ":     {emoji:"🎉",cls:"status-shipped",  label:"ສົ່ງສຳເລັດ"},
   };
   const st=statusMap[o.orderStatus]||{emoji:"❓",cls:"status-waiting",label:o.orderStatus||"?"};
   const steps=[
-    {key:"ລໍຖ້າຮັບຍອດ",label:"ລໍຖ້າຮັບຍອດ"},
-    {key:"ແມ່ຄ້າຮັບຍອດແລ້ວ",label:"ຮັບຍອດ"},
-    {key:"ກຳລັງກຽມການຈັດສົ່ງ",label:"ກຽມສົ່ງ"},
-    {key:"ຈັດສົ່ງສຳເລັດ",label:"ສ່ງແລ້ວ"},
+    {key:"ລໍຖ້າຮັບຍອດ",    label:"ລໍຖ້າ",   icon:"🏪"},
+    {key:"ແມ່ຄ້າຮັບຍອດແລ້ວ",label:"ຮັບຍອດ", icon:"✅"},
+    {key:"ກຳລັງກຽມການຈັດສົ່ງ",label:"ກຽມສົ່ງ",icon:"📦"},
+    {key:"ຈັດສົ່ງສຳເລັດ", label:"ສ່ງແລ້ວ",  icon:"🎉"},
   ];
-  const curIdx=steps.findIndex(s=>s.key===o.orderStatus);
-  let stepsHtml=steps.map((s,i)=>{const done=i<=curIdx;return`<div class="status-step"><div class="step-dot ${done?"step-done":"step-pending"}">${done?"✓":i+1}</div><div><b style="font-size:12px;color:${done?"var(--primary)":"var(--text-sub)"}">${s.label}</b></div></div>`;}).join("");
+  const curIdx=Math.max(0,steps.findIndex(s=>s.key===o.orderStatus));
+  const pct=curIdx===0?0:curIdx===1?33:curIdx===2?66:100;
+
+  // Road tracker HTML
+  const roadHtml=`
+  <div style="margin:14px 0 10px;padding:0 8px">
+    <div style="position:relative;height:60px;">
+      <!-- Road -->
+      <div style="position:absolute;top:28px;left:0;right:0;height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1)"></div>
+      </div>
+      <!-- Car -->
+      <div style="position:absolute;top:10px;left:calc(${pct}% - ${pct>2?16:0}px);transition:left 1.2s cubic-bezier(.4,0,.2,1);font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))">🛵</div>
+      <!-- Stops -->
+      <div style="position:absolute;top:22px;left:0;right:0;display:flex;justify-content:space-between">
+        ${steps.map((s,i)=>{
+          const done=i<=curIdx;
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+            <div style="width:20px;height:20px;border-radius:50%;background:${done?'var(--primary)':'#ddd'};display:flex;align-items:center;justify-content:center;font-size:10px;transition:background .5s">${done?'✓':''}</div>
+            <span style="font-size:9px;color:${done?'var(--primary)':'#aaa'};font-weight:${done?'bold':'normal'};margin-top:2px;white-space:nowrap">${s.label}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+
   const sbUrl=o.shippingBillUrl?`<div style="margin-top:10px"><a href="${o.shippingBillUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(52,152,219,.1);border:1px solid rgba(52,152,219,.3);border-radius:8px;padding:8px 12px;font-size:12px;color:#3498db;text-decoration:none;font-weight:bold">📤 ເບິ່ງບິນຂົນສົ່ງ ▶</a></div>`:"";
+
   return `<div class="status-card" style="margin-bottom:12px">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-      <div><div style="font-size:12px;color:var(--text-sub)">ລະຫັດ</div><div style="font-size:18px;font-weight:800;color:var(--primary);letter-spacing:1px">${o.code||"-"}</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div><div style="font-size:11px;color:var(--text-sub)">ລະຫັດ Order</div><div style="font-size:18px;font-weight:800;color:var(--primary);letter-spacing:1px">${o.code||"-"}</div></div>
       <span class="status-badge ${st.cls}">${st.emoji} ${st.label}</span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 14px;font-size:12px;margin-bottom:12px">
-      <span style="color:var(--text-sub)">👤 ຊື່</span><span style="font-weight:bold">${o.customerName||"-"}</span>
-      <span style="color:var(--text-sub)">📞 ເບີ</span><span>${o.customerPhone||"-"}</span>
-      <span style="color:var(--text-sub)">📍 ທີ່ຢູ່</span><span>${o.customerAddr||"-"}</span>
-      <span style="color:var(--text-sub)">🚚 ຂົນສົ່ງ</span><span>${o.shipping||"-"}</span>
-      <span style="color:var(--text-sub)">💰 ລວມ</span><span style="font-weight:bold;color:var(--primary)">${fN(o.totalAmount||0)} ₭</span>
+    ${roadHtml}
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:12px;margin:10px 0 8px;background:rgba(var(--primary-rgb),.04);border-radius:8px;padding:10px">
+      <span style="color:var(--text-sub)">👤</span><span style="font-weight:bold">${o.customerName||"-"}</span>
+      <span style="color:var(--text-sub)">📞</span><span>${o.customerPhone||"-"}</span>
+      <span style="color:var(--text-sub)">📍</span><span>${o.customerAddr||"-"}</span>
+      <span style="color:var(--text-sub)">🚚</span><span>${o.shipping||"-"}</span>
+      <span style="color:var(--text-sub)">💰</span><span style="font-weight:bold;color:var(--primary)">${fN(o.totalAmount||0)} ₭</span>
     </div>
-    <div style="font-weight:bold;font-size:11px;color:var(--text-sub);margin-bottom:8px">ຄວາມຄືບໜ້າ</div>
-    ${stepsHtml}${sbUrl}
+    ${sbUrl}
   </div>`;
 }
 
