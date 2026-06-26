@@ -381,7 +381,10 @@ function hideLoading(){document.getElementById("page-loading").classList.remove(
 async function loadProds(){
   showLoading();
   try{
-    const rows=await api.get("getPublicProducts","",true);
+    const url=SHOP_CONFIG.orderApiUrl+"?action=getProducts";
+    const res=await fetch(url,{method:"GET",redirect:"follow"});
+    const json=await res.json();
+    const rows=Array.isArray(json)?json:(Array.isArray(json.data)?json.data:[]);
     allProds=rows.map(r=>({name:r[0],cost:r[1],price:r[2],qty:r[3],img:r[4]}));
     renderProds(allProds);
   }catch(e){document.getElementById("prod-grid").innerHTML=`<div style="grid-column:1/-1" class="empty-state">❌ ໂຫຼດບໍ່ສຳເລັດ: ${e.message}</div>`;}
@@ -567,8 +570,14 @@ async function checkStatus(){
   const el=document.getElementById("status-result");
   try{
     let res;
-    if(phone) res=await api.get("getOrderStatus","",true,{phone});
-    else res=await api.get("getOrderStatus","",true,{code});
+    const baseUrl=SHOP_CONFIG.orderApiUrl;
+    if(phone){
+      const r=await fetch(baseUrl+"?action=getOrderStatus&phone="+encodeURIComponent(phone),{method:"GET",redirect:"follow"});
+      res=await r.json();
+    } else {
+      const r=await fetch(baseUrl+"?action=getOrderStatus&code="+encodeURIComponent(code),{method:"GET",redirect:"follow"});
+      res=await r.json();
+    }
     renderStatus(res);
   }catch(e){el.innerHTML=`<div class="empty-state">❌ ${e.message}</div>`;}
   finally{hideLoading();}
@@ -619,17 +628,7 @@ function renderStatusCard(o){
   </div>`;
 }
 
-// override api.get to handle optional params
-const _apiGet=api.get.bind(api);
-api.get=async function(action,params={},useOrder=false,extraParams={}){
-  const url=useOrder?SHOP_CONFIG.orderApiUrl:SHOP_CONFIG.backendApiUrl;
-  const qs=new URLSearchParams({action,...extraParams}).toString();
-  const res=await fetch(`${url}?${qs}`,{method:"GET",redirect:"follow"});
-  if(!res.ok)throw new Error("HTTP "+res.status);
-  const json=await res.json();
-  if(json.success===false)throw new Error(json.error||"API error");
-  return json.data!==undefined?json.data:json;
-};
+// api calls use direct fetch in shop page
 </script>
 </body>
 </html>
